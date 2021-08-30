@@ -1,6 +1,6 @@
 # vue3-swatches
 
-🎨 Help the user picking beautiful colors!
+🎨 Vue 3 swatch picker
 
 Though not a fork, this package is a complete copy of [vue-swatches](https://github.com/saintplay/vue-swatches) made to work with Vue 3.
 

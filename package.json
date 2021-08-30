@@ -1,7 +1,11 @@
 {
   "name": "vue3-swatches",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "🎨 Vue 3 swatch picker",
+  "keywords": [
+    "vue",
+    "swatch"
+  ],
   "main": "dist/vue3-swatches.ssr.js",
   "browser": "dist/vue3-swatches.esm.js",
   "module": "dist/vue3-swatches.esm.js",
