@@ -53,7 +53,7 @@ export default defineComponent({
 <template>
   <VSwatches v-model="color">
     <template v-slot:trigger>
-      <input :value="color" class="form__input__element" readonly>
+      <input :value="color" readonly />
     </template>
   </VSwatches>
 </template>
