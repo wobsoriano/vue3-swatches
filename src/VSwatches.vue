@@ -252,15 +252,15 @@ export default defineComponent({
     },
     swatchStyle: {
       type: [Object, Array],
-      default: () => {}
+      default: () => ({})
     },
     triggerStyle: {
       type: [Object, Array],
-      default: () => {}
+      default: () => ({})
     },
     wrapperStyle: {
       type: [Object, Array],
-      default: () => {}
+      default: () => ({})
     },
     modelValue: {
       type: String,
