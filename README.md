@@ -47,6 +47,18 @@ export default defineComponent({
 </script>
 ```
 
+### Using a Custom Trigger
+
+```html
+<template>
+  <VSwatches v-model="color">
+    <template v-slot:trigger>
+      <input :value="color" class="form__input__element" readonly>
+    </template>
+  </VSwatches>
+</template>
+```
+
 Head over to https://saintplay.github.io/vue-swatches/ for the complete documentation.
 
 ### License
