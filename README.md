@@ -37,10 +37,8 @@ import VSwatches from 'vue3-swatches'
 export default defineComponent({
   components: { VSwatches },
   setup() {
-    const color = ref('#1FBC9C')
-
     return {
-      color
+      color: ref('#1FBC9C')
     }
   }
 })
