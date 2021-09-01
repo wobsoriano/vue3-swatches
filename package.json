@@ -10,9 +10,11 @@
   "browser": "dist/vue3-swatches.esm.js",
   "module": "dist/vue3-swatches.esm.js",
   "unpkg": "dist/vue3-swatches.min.js",
+  "types": "index.d.ts",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "index.d.ts"
   ],
   "sideEffects": false,
   "scripts": {
