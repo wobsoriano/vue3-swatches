@@ -27,23 +27,14 @@ app.use(VSwatches)
 
 ```html
 <template>
-  <VSwatches v-model="color" />
+  <VueSwatches v-model="color" />
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
-import VSwatches from 'vue3-swatches'
+<script setup>
+import { ref } from 'vue';
+import VSwatches from 'vue3-swatches';
 
-export default defineComponent({
-  components: { VSwatches },
-  setup() {
-    const color = ref('#1FBC9C')
-
-    return {
-      color
-    }
-  }
-})
+const color = ref("#1FBC9C")
 </script>
 ```
 
