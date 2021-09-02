@@ -31,8 +31,8 @@ app.use(VSwatches)
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import VSwatches from 'vue3-swatches';
+import { ref } from 'vue'
+import VSwatches from 'vue3-swatches'
 
 const color = ref("#1FBC9C")
 </script>
