@@ -23,7 +23,7 @@ const app = createApp(App)
 app.use(VSwatches)
 ```
 
-### Or: Import and register it locally
+### Or: Import it locally
 
 ```html
 <template>
