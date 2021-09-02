@@ -27,7 +27,7 @@ app.use(VSwatches)
 
 ```html
 <template>
-  <VueSwatches v-model="color" />
+  <VSwatches v-model="color" />
 </template>
 
 <script setup>
