@@ -97,7 +97,6 @@
               :swatch-style="swatchStyle"
               @blur="relatedTarget => onBlur(relatedTarget)"
               @click.native="updateSwatch(swatch)"
-              @click="updateSwatch(swatch)"
             />
           </template>
         </div>
