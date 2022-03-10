@@ -16,11 +16,11 @@ yarn add vue3-swatches
 
 ```js
 // main.js
-import { createApp } from 'vue'
-import VSwatches from 'vue3-swatches'
+import { createApp } from "vue";
+import VSwatches from "vue3-swatches";
 
-const app = createApp(App)
-app.use(VSwatches)
+const app = createApp(App);
+app.use(VSwatches);
 ```
 
 ### Or: Import it locally
@@ -31,10 +31,10 @@ app.use(VSwatches)
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import VSwatches from 'vue3-swatches'
+  import { ref } from "vue";
+  import VSwatches from "vue3-swatches";
 
-const color = ref("#1FBC9C")
+  const color = ref("#1FBC9C");
 </script>
 ```
 
@@ -54,4 +54,4 @@ Head over to https://saintplay.github.io/vue-swatches/ for the complete document
 
 ### License
 
-[MIT License](http://opensource.org/licenses/MIT).
+MIT
