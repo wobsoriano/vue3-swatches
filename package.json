@@ -1,6 +1,6 @@
 {
   "name": "vue3-swatches",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "🎨 Vue 3 swatch picker",
   "keywords": [
     "vue",
@@ -10,11 +10,9 @@
   "browser": "dist/vue3-swatches.esm.js",
   "module": "dist/vue3-swatches.esm.js",
   "unpkg": "dist/vue3-swatches.min.js",
-  "types": "index.d.ts",
   "files": [
     "dist/*",
-    "src/**/*.vue",
-    "index.d.ts"
+    "src/**/*.vue"
   ],
   "sideEffects": false,
   "scripts": {
@@ -23,7 +21,8 @@
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
+    "release": "bumpp --commit --push --tag && pnpm publish"
   },
   "dependencies": {},
   "devDependencies": {
@@ -37,6 +36,7 @@
     "@vue/cli-plugin-babel": "^4.5.13",
     "@vue/cli-service": "^4.5.13",
     "@vue/compiler-sfc": "^3.0.11",
+    "bumpp": "^7.1.1",
     "cross-env": "^7.0.3",
     "minimist": "^1.2.5",
     "postcss": "^8.2.10",
