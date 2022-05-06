@@ -10,9 +10,10 @@
   "browser": "dist/vue3-swatches.esm.js",
   "module": "dist/vue3-swatches.esm.js",
   "unpkg": "dist/vue3-swatches.min.js",
+  "types": "./swatch.d.ts",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "./swatch.d.ts"
   ],
   "scripts": {
     "serve": "vue-cli-service serve dev/serve.js",
