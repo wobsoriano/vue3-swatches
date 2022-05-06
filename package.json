@@ -22,7 +22,7 @@
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
-    "release": "bumpp --commit --push --tag && yarn publish"
+    "release": "bumpp --commit --push --tag && pnpm run publish"
   },
   "dependencies": {},
   "devDependencies": {
