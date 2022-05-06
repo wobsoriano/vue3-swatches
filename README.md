@@ -43,7 +43,7 @@ app.use(VSwatches);
 ```html
 <template>
   <VSwatches v-model="color">
-    <template v-slot:trigger>
+    <template #trigger>
       <input :value="color" readonly />
     </template>
   </VSwatches>
