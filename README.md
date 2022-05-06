@@ -25,17 +25,17 @@ app.use(VSwatches);
 
 ### Or: Import it locally
 
-```html
-<template>
-  <VSwatches v-model="color" />
-</template>
-
+```vue
 <script setup>
   import { ref } from "vue";
   import VSwatches from "vue3-swatches";
 
   const color = ref("#1FBC9C");
 </script>
+
+<template>
+  <VSwatches v-model="color" />
+</template>
 ```
 
 ### Using a Custom Trigger
