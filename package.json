@@ -1,6 +1,6 @@
 {
   "name": "vue3-swatches",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "🎨 Vue 3 swatch picker",
   "keywords": [
     "vue",
@@ -22,7 +22,7 @@
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
-    "release": "bumpp --commit --push --tag && pnpm run publish"
+    "release": "bumpp --commit --push --tag && pnpm publish"
   },
   "dependencies": {},
   "devDependencies": {
