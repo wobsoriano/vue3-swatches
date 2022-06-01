@@ -1,6 +1,6 @@
-
 // Import vue component
 import component from '@/VSwatches.vue';
+import presets from './presets';
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
@@ -15,6 +15,10 @@ export default /*#__PURE__*/(() => {
   };
   return installable;
 })();
+
+export {
+  presets
+}
 
 // It's possible to expose named exports when writing components that can
 // also be used as directives, etc. - eg. import { RollupDemoDirective } from 'rollup-demo';

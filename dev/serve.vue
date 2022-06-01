@@ -4,11 +4,13 @@
 
 <script setup>
 import { ref, watch } from 'vue';
-import VueSwatches from '@/VSwatches.vue';
-
-const color = ref("#1FBC9C")
+import VueSwatches, { presets } from '@/entry.esm';
+console.log(presets)
+const color = ref(presets.basic.colors[0])
 
 watch(color, (val) => {
   console.log(val)
+}, {
+  immediate: true
 })
 </script>
