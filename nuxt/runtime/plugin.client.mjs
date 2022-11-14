@@ -1,6 +1,7 @@
 import { defineNuxtPlugin } from '#app'
+import { VSwatches } from 'vue3-swatches'
+import 'vue3-swatches/dist/style.css'
 
 export default defineNuxtPlugin(async (nuxtApp) => {
-  const VSwatches = await import('vue3-swatches').then(r => r.default || r)
-  nuxtApp.vueApp.use(VSwatches)
+  nuxtApp.vueApp.component('VSwatches', VSwatches)
 })
