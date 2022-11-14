@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-swatches" tabindex="-1" ref="main">
+  <div class="vue-swatches" tabindex="-1" ref="main" @blur="e => onBlur(e.relatedTarget as any)">
     <!-- Trigger -->
     <div
       v-if="!inline"
