@@ -4,12 +4,6 @@ import textAdvanced from "./text-advanced";
 
 export { basic, textBasic, textAdvanced };
 
-export default {
-  basic: basic,
-  "text-basic": textBasic,
-  "text-advanced": textAdvanced
-};
-
 export const supportedProperties = [
   "colors", // Required
   "borderRadius", // Optional String: '50px', '0', '40%'
