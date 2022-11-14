@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-swatches" tabindex="-1" @blur="e => onBlur(e.relatedTarget)">
+  <div class="vue-swatches" tabindex="-1" ref="main">
     <!-- Trigger -->
     <div
       v-if="!inline"
@@ -49,17 +49,17 @@
                 :key="swatchIndex"
                 :is-last="
                   index === computedSwatches.length - 1 &&
-                    swatchIndex === swatchRow.length
+                    swatchIndex === (swatchRow as []).length
                 "
                 :row-length-setted="
                   rowLength !== null || presetRowLength !== null
                 "
-                :border-radius="computedBorderRadius"
+                :border-radius="computedBorderRadius as string"
                 :disabled="getSwatchDisabled(swatch)"
                 :inline="inline"
                 :selected="checkEquality(getSwatchColor(swatch), modelValue)"
                 :swatch-size="computedSwatchSize"
-                :spacing-size="computedSpacingSize"
+                :spacing-size="computedSpacingSize as number"
                 :show-border="getSwatchShowBorder(swatch)"
                 :show-checkbox="showCheckbox"
                 :show-labels="showLabels"
@@ -82,12 +82,12 @@
               :row-length-setted="
                 rowLength !== null || presetRowLength !== null
               "
-              :border-radius="computedBorderRadius"
+              :border-radius="computedBorderRadius as string"
               :disabled="getSwatchDisabled(swatch)"
               :inline="inline"
               :selected="checkEquality(getSwatchColor(swatch), modelValue)"
               :swatch-size="computedSwatchSize"
-              :spacing-size="computedSpacingSize"
+              :spacing-size="computedSpacingSize as number"
               :show-border="getSwatchShowBorder(swatch)"
               :show-checkbox="showCheckbox"
               :show-labels="showLabels"
@@ -113,7 +113,7 @@
               :value="internalValue"
               :type="fallbackInputType"
               @input="
-                e => updateSwatch(e.target.value, { fromFallbackInput: true })
+                e => updateSwatch((e.target as HTMLInputElement).value, { fromFallbackInput: true })
               "
             />
           </span>
@@ -131,475 +131,409 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { computed, ComputedRef, onMounted, ref, StyleValue, watch } from "vue";
 import basicPreset from "./presets/basic";
 import textBasicPreset from "./presets/text-basic";
 import textAdvancedPreset from "./presets/text-advanced";
 import VSwatch from "./VSwatch.vue";
-export const DEFAULT_BACKGROUND_COLOR = "#ffffff";
-export const DEFAULT_BORDER_RADIUS = "10px";
-export const DEFAULT_ROW_LENGTH = 4;
-export const DEFAULT_TRIGGER_CONTAINER_SPACE = 5;
-export const DEFAULT_SWATCH_SIZE = 42;
-export const DEFAULT_SHOW_BORDER = false;
-export const extractPropertyFromPreset = (
-  presetName,
-  property,
-  alwaysReturn
+
+const main = ref<HTMLDivElement | null>(null)
+const triggerWrapper = ref<HTMLDivElement | null>(null)
+const containerWrapper = ref<HTMLDivElement | null>(null)
+
+const DEFAULT_BORDER_RADIUS = "10px";
+const DEFAULT_ROW_LENGTH = 4;
+const DEFAULT_TRIGGER_CONTAINER_SPACE = 5;
+const DEFAULT_SWATCH_SIZE = 42;
+const DEFAULT_SHOW_BORDER = false;
+const extractPropertyFromPreset = (
+  presetName: any,
+  property: string,
+  alwaysReturn?: boolean
 ) => {
   if (typeof presetName !== "string") return null;
   else if (presetName === "text-basic")
-    return textBasicPreset[property] === undefined
+    return textBasicPreset[property as keyof typeof textBasicPreset] === undefined
       ? null
-      : textBasicPreset[property];
+      : textBasicPreset[property as keyof typeof textBasicPreset];
   else if (presetName === "text-advanced")
-    return textAdvancedPreset[property] === undefined
+    return textAdvancedPreset[property as keyof typeof textAdvancedPreset] === undefined
       ? null
-      : textAdvancedPreset[property];
+      : textAdvancedPreset[property as keyof typeof textAdvancedPreset];
   else if (presetName === "basic")
-    return basicPreset[property] === undefined ? null : basicPreset[property];
+    return basicPreset[property as keyof typeof basicPreset] === undefined ? null : basicPreset[property as keyof typeof basicPreset];
   else if (alwaysReturn)
-    return basicPreset[property] === undefined ? null : basicPreset[property];
+    return basicPreset[property as keyof typeof basicPreset] === undefined ? null : basicPreset[property as keyof typeof basicPreset];
   else return null;
 };
-export default defineComponent({
-  name: "v-swatches",
-  components: {
-    VSwatch
-  },
-  props: {
-    backgroundColor: {
-      type: String,
-      default: DEFAULT_BACKGROUND_COLOR
+
+const props = withDefaults(defineProps<{
+  backgroundColor?: string
+  closeOnSelect?: boolean
+  swatches?: any[] | string
+  disabled?: boolean
+  fallbackInputClass?: any[] | Record<string, any> | string | null
+  fallbackInputType?: string
+  fallbackOkClass?: any[] | Record<string, any> | string  | null
+  fallbackOkText?: string
+  inline?: boolean
+  shapes?: string
+  popoverX?: string
+  popoverY?: string
+  rowLength?: number | string | null
+  showBorder?: boolean | null
+  showFallback?: boolean
+  showCheckbox?: boolean
+  showLabels?: boolean
+  spacingSize?: number | null
+  swatchSize?: number | string | null
+  swatchStyle?: Record<string, any> | any[]
+  triggerStyle?: Record<string, any> | any[]
+  wrapperStyle?: Record<string, any> | any[]
+  modelValue?: string
+}>(), {
+  backgroundColor: "#ffffff",
+  closeOnSelect: true,
+  swatches: () => "basic",
+  disabled: false,
+  fallbackInputClass: null,
+  fallbackInputType: () => "text",
+  fallbackOkClass: null,
+  fallbackOkText: "Ok",
+  inline: false,
+  shapes: "squares",
+  popoverX: "right",
+  popoverY: "bottom",
+  rowLength: null,
+  showBorder: null,
+  showFallback: false,
+  showCheckbox: true,
+  showLabels: false,
+  spacingSize: null,
+  swatchSize: null,
+  modelValue: '',
+});
+
+const $emit = defineEmits(["close", "open", "update:modelValue"]);
+
+const alwaysOnScreenStyle = ref({});
+const componentMounted = ref(false);
+const internalValue = ref(props.modelValue);
+const internalIsOpen = ref(false);
+
+onMounted(() => {
+  componentMounted.value = true;
+});
+
+const isNested = computed(() => {
+  if (
+    computedSwatches.value &&
+    computedSwatches.value.length &&
+    // @ts-ignore
+    computedSwatches.value[0] instanceof Array
+  ) {
+    return true;
+  }
+  return false;
+});
+const isOpen = computed(() => {
+  if (props.inline) return false;
+  return internalIsOpen.value;
+});
+const isNoColor = computed(() => {
+  return checkEquality("", props.modelValue);
+});
+const presetBorderRadius = computed(() => {
+  return extractPropertyFromPreset(props.swatches, "borderRadius");
+});
+const presetRowLength = computed(() => {
+  return extractPropertyFromPreset(props.swatches, "rowLength");
+});
+const presetShowBorder = computed(() => {
+  return extractPropertyFromPreset(props.swatches, "showBorder");
+});
+const presetSwatchSize = computed(() => {
+  return extractPropertyFromPreset(props.swatches, "swatchSize");
+});
+const presetSpacingSize = computed(() => {
+  return extractPropertyFromPreset(props.swatches, "spacingSize");
+});
+const computedSwatches = computed(() => {
+  if (props.swatches instanceof Array) return props.swatches;
+  /* istanbul ignore else */
+  if (typeof props.swatches === "string") {
+    return extractPropertyFromPreset(props.swatches, "colors", true);
+  } else {
+    return [];
+  }
+}) as ComputedRef<[]>;
+const computedBorderRadius = computed(() => {
+  // Priorize preset value
+  if (presetBorderRadius.value !== null) return presetBorderRadius.value;
+  // over computed value
+  return borderRadius.value;
+});
+const computedRowLength = computed(() => {
+  // Priorize user value
+  if (props.rowLength !== null) return Number(props.rowLength);
+  // Over preset value
+  else if (presetRowLength.value !== null) return presetRowLength.value;
+  // If there are less swatches than the default
+  else if (
+    computedSwatches.value.length < DEFAULT_ROW_LENGTH &&
+    !isNested.value
+  )
+    return computedSwatches.value.length;
+  // Use default otherwise
+  return DEFAULT_ROW_LENGTH;
+});
+const computedSwatchSize = computed(() => {
+  // Priorize user value
+  if (props.swatchSize !== null) return Number(props.swatchSize);
+  else if (presetSwatchSize.value !== null)
+    // over preset value
+    return presetSwatchSize.value;
+  // Use default value if these two are unset
+  return DEFAULT_SWATCH_SIZE;
+}) as ComputedRef<number>;
+const computedSpacingSize = computed(() => {
+  // Priorize user value
+  if (props.spacingSize !== null) return props.spacingSize;
+  // Priorize preset value
+  if (presetSpacingSize.value !== null) return presetSpacingSize.value;
+  // over computed value
+  return Math.round(computedSwatchSize.value * 0.25);
+});
+const computedShowBorder = computed(() => {
+  // Priorize user value
+  if (props.showBorder !== null) return props.showBorder;
+  // over preset value
+  if (presetShowBorder.value !== null) return presetShowBorder.value;
+  // Use default value if these two are unset
+  return DEFAULT_SHOW_BORDER;
+});
+const showFallbackOk = computed(() => {
+  return !props.inline;
+});
+const borderRadius = computed(() => {
+  if (props.shapes === "squares")
+    return `${Math.round(computedSwatchSize.value * 0.25)}px`;
+  else if (props.shapes === "circles") return `50%`;
+  /* istanbul ignore next */
+  return "";
+});
+const wrapperWidth = computed(() => {
+  return (
+    // @ts-ignore
+    computedRowLength.value * (computedSwatchSize.value + computedSpacingSize.value)
+  );
+});
+const computedtriggerStyle = computed(() => {
+  return {
+    width: "42px",
+    height: "42px",
+    backgroundColor: props.modelValue ? props.modelValue : "#ffffff",
+    borderRadius: props.shapes === "circles" ? "50%" : DEFAULT_BORDER_RADIUS
+  };
+});
+const triggerStyles = computed(() => {
+  return [computedtriggerStyle.value, props.triggerStyle] as StyleValue;
+});
+const containerStyles = computed(() => {
+  const baseStyles = [
+    {
+      backgroundColor: props.backgroundColor
     },
-    closeOnSelect: {
-      type: Boolean,
-      default: true
-    },
-    swatches: {
-      type: [Array, String],
-      default: () => "basic"
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    },
-    fallbackInputClass: {
-      type: [Array, Object, String],
-      default: null
-    },
-    fallbackInputType: {
-      type: String,
-      default: () => "text",
-      validator(value) {
-        return ["text", "color"].indexOf(value) !== -1;
-      }
-    },
-    fallbackOkClass: {
-      type: [Array, Object, String],
-      default: null
-    },
-    fallbackOkText: {
-      type: String,
-      default: "Ok"
-    },
-    inline: {
-      type: Boolean,
-      default: false
-    },
-    shapes: {
-      type: String,
-      default: "squares"
-    },
-    popoverX: {
-      type: String,
-      default: "right"
-    },
-    popoverY: {
-      type: String,
-      default: "bottom"
-    },
-    rowLength: {
-      type: [Number, String],
-      default: null // The default is especified as DEFAULT_ROW_LENGTH
-    },
-    showBorder: {
-      type: Boolean,
-      default: null // The default is especified as DEFAULT_SHOW_BORDER
-    },
-    showFallback: {
-      type: Boolean,
-      default: false
-    },
-    showCheckbox: {
-      type: Boolean,
-      default: true
-    },
-    showLabels: {
-      type: Boolean,
-      default: false
-    },
-    spacingSize: {
-      type: Number,
-      default: null // The default depends on swatch size
-    },
-    swatchSize: {
-      type: [Number, String],
-      default: null // The default is especified as DEFAULT_SWATCH_SIZE
-    },
-    swatchStyle: {
-      type: [Object, Array],
-      default: () => ({})
-    },
-    triggerStyle: {
-      type: [Object, Array],
-      default: () => ({})
-    },
-    wrapperStyle: {
-      type: [Object, Array],
-      default: () => ({})
-    },
-    modelValue: {
-      type: String,
-      default: null
+    alwaysOnScreenStyle.value
+  ];
+  if (props.inline) return baseStyles;
+  return [
+    ...baseStyles,
+    {
+      padding: "5px",
+      marginBottom: "5px"
     }
-  },
-  data() {
-    return {
-      alwaysOnScreenStyle: {},
-      componentMounted: false,
-      internalValue: this.modelValue,
-      internalIsOpen: false
-    };
-  },
-  computed: {
-    isNested() {
-      if (
-        this.computedSwatches &&
-        this.computedSwatches.length &&
-        this.computedSwatches[0] instanceof Array
-      ) {
-        return true;
-      }
-      return false;
-    },
-    isOpen() {
-      if (this.inline) return false;
-      return this.internalIsOpen;
-    },
-    isNoColor() {
-      return this.checkEquality("", this.modelValue);
-    },
-    /** REAL COMPUTEDS (depends on user's props and preset's values, these have 'computed' prefix) **/
-    // Preset Computeds
-    presetBorderRadius() {
-      return extractPropertyFromPreset(this.swatches, "borderRadius");
-    },
-    presetRowLength() {
-      return extractPropertyFromPreset(this.swatches, "rowLength");
-    },
-    presetShowBorder() {
-      return extractPropertyFromPreset(this.swatches, "showBorder");
-    },
-    presetSwatchSize() {
-      return extractPropertyFromPreset(this.swatches, "swatchSize");
-    },
-    presetSpacingSize() {
-      return extractPropertyFromPreset(this.swatches, "spacingSize");
-    },
-    // Computed value for `swatches`
-    computedSwatches() {
-      if (this.swatches instanceof Array) return this.swatches;
-      /* istanbul ignore else */
-      if (typeof this.swatches === "string") {
-        return extractPropertyFromPreset(this.swatches, "colors", true);
-      } else {
-        return [];
-      }
-    },
-    // Computed value for `borderRadius`
-    computedBorderRadius() {
-      // Priorize preset value
-      if (this.presetBorderRadius !== null) return this.presetBorderRadius;
-      // over computed value
-      return this.borderRadius;
-    },
-    // Computed value for `rowLength`
-    computedRowLength() {
-      // Priorize user value
-      if (this.rowLength !== null) return Number(this.rowLength);
-      // Over preset value
-      else if (this.presetRowLength !== null) return this.presetRowLength;
-      // If there are less swatches than the default
-      else if (
-        this.computedSwatches.length < DEFAULT_ROW_LENGTH &&
-        !this.isNested
-      )
-        return this.computedSwatches.length;
-      // Use default otherwise
-      return DEFAULT_ROW_LENGTH;
-    },
-    // Computed value for `swatchSize`
-    computedSwatchSize() {
-      // Priorize user value
-      if (this.swatchSize !== null) return Number(this.swatchSize);
-      else if (this.presetSwatchSize !== null)
-        // over preset value
-        return this.presetSwatchSize;
-      // Use default value if these two are unset
-      return DEFAULT_SWATCH_SIZE;
-    },
-    // Computed value for `spacingSize`
-    computedSpacingSize() {
-      // Priorize user value
-      if (this.spacingSize !== null) return this.spacingSize;
-      // Priorize preset value
-      if (this.presetSpacingSize !== null) return this.presetSpacingSize;
-      // over computed value
-      return Math.round(this.computedSwatchSize * 0.25);
-    },
-    // Computed value for `showBorder`
-    computedShowBorder() {
-      // Priorize user value
-      if (this.showBorder !== null) return this.showBorder;
-      // over preset value
-      if (this.presetShowBorder !== null) return this.presetShowBorder;
-      // Use default value if these two are unset
-      return DEFAULT_SHOW_BORDER;
-    },
-    showFallbackOk() {
-      return !this.inline;
-    },
-    /** DUMB COMPUTEDS (these only mutate props) **/
-    borderRadius() {
-      if (this.shapes === "squares")
-        return `${Math.round(this.computedSwatchSize * 0.25)}px`;
-      else if (this.shapes === "circles") return `50%`;
-      /* istanbul ignore next */
-      return "";
-    },
-    wrapperWidth() {
-      return (
-        this.computedRowLength *
-        (this.computedSwatchSize + this.computedSpacingSize)
-      );
-    },
-    /** COMPUTED STYLES **/
-    computedtriggerStyle() {
-      return {
-        width: "42px",
-        height: "42px",
-        backgroundColor: this.modelValue ? this.modelValue : "#ffffff",
-        borderRadius: this.shapes === "circles" ? "50%" : DEFAULT_BORDER_RADIUS
-      };
-    },
-    triggerStyles() {
-      return [this.computedtriggerStyle, this.triggerStyle];
-    },
-    containerStyles() {
-      const baseStyles = [
-        {
-          backgroundColor: this.backgroundColor
-        },
-        this.alwaysOnScreenStyle
-      ];
-      if (this.inline) return baseStyles;
-      return [
-        ...baseStyles,
-        {
-          padding: "5px",
-          marginBottom: "5px"
-        }
-      ];
-    },
-    computedWrapperStyle() {
-      if (this.inline) return {};
-      return {
-        paddingTop: `${this.computedSpacingSize}px`,
-        paddingLeft: `${this.computedSpacingSize}px`,
-        width: `${this.wrapperWidth}px`
-      };
-    },
-    wrapperStyles() {
-      return [this.computedWrapperStyle, this.wrapperStyle];
-    },
-    computedFallbackWrapperStyle() {
-      const baseStyles = {
-        marginLeft: `${this.computedSpacingSize}px`,
-        paddingBottom: `${this.computedSpacingSize}px`
-      };
-      if (this.inline) return baseStyles;
-      return {
-        ...baseStyles,
-        width: `${this.wrapperWidth - this.computedSpacingSize}px`
-      };
-    },
-    computedFallbackWrapperStyles() {
-      return [this.computedFallbackWrapperStyle];
+  ];
+});
+const computedWrapperStyle = computed(() => {
+  if (props.inline) return {};
+  return {
+    paddingTop: `${computedSpacingSize.value}px`,
+    paddingLeft: `${computedSpacingSize.value}px`,
+    width: `${wrapperWidth.value}px`
+  };
+});
+const wrapperStyles = computed(() => {
+  return [computedWrapperStyle.value, props.wrapperStyle] as StyleValue;
+});
+const computedFallbackWrapperStyle = computed(() => {
+  const baseStyles = {
+    marginLeft: `${computedSpacingSize.value}px`,
+    paddingBottom: `${computedSpacingSize.value}px`
+  };
+  if (props.inline) return baseStyles;
+  return {
+    ...baseStyles,
+    width: `${wrapperWidth.value - (computedSpacingSize.value as number)}px`
+  };
+});
+const computedFallbackWrapperStyles = computed(() => {
+  return [computedFallbackWrapperStyle.value];
+});
+
+watch(() => props.modelValue, (newValue) => {
+  internalValue.value = newValue;
+});
+
+function checkEquality(color1: string, color2: string) {
+  if ((!color1 && color1 !== "") || (!color2 && color2 !== ""))
+    return false;
+  return color1.toUpperCase() === color2.toUpperCase();
+};
+function hidePopover() {
+  internalIsOpen.value = false;
+  main.value?.blur();
+  $emit("close", internalValue.value);
+};
+function getAlwaysOnScreenStyle() {
+  const styles: Record<string, string | number> = {};
+  const triggerEl = triggerWrapper.value!
+  const containerEl = containerWrapper.value!
+  /* istanbul ignore if */
+  if (
+    !componentMounted.value ||
+    props.inline ||
+    !triggerEl ||
+    !window ||
+    !document
+  )
+    return styles;
+  const triggerRect = triggerEl.getBoundingClientRect();
+  const leftMin = 5;
+  const rightMax =
+    (document.documentElement.clientWidth || window.innerWidth) - 5;
+  const topMin = 5;
+  const bottomMax =
+    (document.documentElement.clientHeight || window.innerHeight) - 5;
+  containerEl.style.visibility = "hidden";
+  containerEl.style.display = "block";
+  const containerRect = containerEl.getBoundingClientRect();
+  containerEl.style.display = "none";
+  containerEl.style.visibility = "visible";
+  if (props.popoverY === "top") {
+    if (triggerRect.top - containerRect.height < topMin) {
+      // Showing bellow
+      styles.top = `${triggerRect.height +
+        DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
+      styles.bottom = "auto";
+    } else {
+      // Showing above
+      styles.bottom = `${triggerRect.height +
+        DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
+      styles.top = "auto";
     }
-  },
-  watch: {
-    modelValue(newValue) {
-      this.internalValue = newValue;
-    }
-  },
-  mounted() {
-    this.componentMounted = true;
-  },
-  methods: {
-    // Called programmatically
-    checkEquality(color1, color2) {
-      if ((!color1 && color1 !== "") || (!color2 && color2 !== ""))
-        return false;
-      return color1.toUpperCase() === color2.toUpperCase();
-    },
-    hidePopover() {
-      this.internalIsOpen = false;
-      this.$el.blur();
-      this.$emit("close", this.internalValue);
-    },
-    getAlwaysOnScreenStyle() {
-      const styles = {};
-      const triggerEl = this.$refs.triggerWrapper;
-      const containerEl = this.$refs.containerWrapper;
-      /* istanbul ignore if */
-      if (
-        !this.componentMounted ||
-        this.inline ||
-        !triggerEl ||
-        !window ||
-        !document
-      )
-        return styles;
-      const triggerRect = triggerEl.getBoundingClientRect();
-      const leftMin = 5;
-      const rightMax =
-        (document.documentElement.clientWidth || window.innerWidth) - 5;
-      const topMin = 5;
-      const bottomMax =
-        (document.documentElement.clientHeight || window.innerHeight) - 5;
-      containerEl.style.visibility = "hidden";
-      containerEl.style.display = "block";
-      const containerRect = containerEl.getBoundingClientRect();
-      containerEl.style.display = "none";
-      containerEl.style.visibility = "visible";
-      if (this.popoverY === "top") {
-        if (triggerRect.top - containerRect.height < topMin) {
-          // Showing bellow
-          styles.top = `${triggerRect.height +
-            DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
-          styles.bottom = "auto";
-        } else {
-          // Showing above
-          styles.bottom = `${triggerRect.height +
-            DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
-          styles.top = "auto";
-        }
+  } else {
+    /* istanbul ignore else */
+    if (props.popoverY === "bottom") {
+      if (triggerRect.bottom + containerRect.height > bottomMax) {
+        // Showing above
+        styles.bottom = `${triggerRect.height +
+          DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
+        styles.top = "auto";
       } else {
-        /* istanbul ignore else */
-        if (this.popoverY === "bottom") {
-          if (triggerRect.bottom + containerRect.height > bottomMax) {
-            // Showing above
-            styles.bottom = `${triggerRect.height +
-              DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
-            styles.top = "auto";
-          } else {
-            // Showing bellow
-            styles.top = `${triggerRect.height +
-              DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
-            styles.bottom = "auto";
-          }
-        }
-      }
-      if (this.popoverX === "left") {
-        if (triggerRect.right - containerRect.width < leftMin) {
-          // Showing at the right
-          styles.left = 0;
-          styles.right = "auto";
-        } else {
-          // Showing at the left
-          styles.right = 0;
-          styles.left = "auto";
-        }
-      } else {
-        /* istanbul ignore else */
-        if (this.popoverX === "right") {
-          if (triggerRect.left + containerRect.width > rightMax) {
-            // Showing at the left
-            styles.right = 0;
-            styles.left = "auto";
-          } else {
-            // Showing at the right
-            styles.left = 0;
-            styles.right = "auto";
-          }
-        }
-      }
-      return styles;
-    },
-    getSwatchShowBorder(swatch) {
-      if (typeof swatch === "string") return this.computedShowBorder;
-      else if (typeof swatch === "object")
-        return swatch.showBorder !== undefined
-          ? swatch.showBorder
-          : this.computedShowBorder;
-    },
-    getSwatchColor(swatch) {
-      if (typeof swatch === "string") return swatch;
-      else if (typeof swatch === "object") return swatch.color;
-    },
-    getSwatchDisabled(swatch) {
-      if (typeof swatch === "string") return this.disabled;
-      else if (typeof swatch === "object")
-        return swatch.disabled !== undefined ? swatch.disabled : this.disabled;
-    },
-    getSwatchLabel(swatch) {
-      if (typeof swatch === "string") return swatch;
-      else if (typeof swatch === "object") return swatch.label || swatch.color;
-    },
-    getSwatchAlt(swatch) {
-      if (typeof swatch === "string") return swatch;
-      else if (typeof swatch === "object")
-        return swatch.alt || this.getSwatchLabel(swatch);
-    },
-    // Called by user action
-    onBlur(relatedTarget) {
-      /* istanbul ignore if */
-      if (!this.isOpen) return; /* dont hide */
-      // We only close the Popover if the relatedTarget came from outside the component
-      // Check if the relatedTarget is inside the component
-      if (relatedTarget !== null && this.$el.contains(relatedTarget))
-        return; /* dont hide */
-      this.internalIsOpen = false;
-      this.$emit("close", this.internalValue);
-    },
-    onFallbackButtonClick() {
-      this.hidePopover();
-    },
-    // Called programmatically
-    showPopover() {
-      /* istanbul ignore if */
-      if (this.isOpen || this.inline || this.disabled) return; /* dont show */
-      this.alwaysOnScreenStyle = this.getAlwaysOnScreenStyle();
-      this.internalIsOpen = true;
-      this.$el.focus();
-      this.$emit("open");
-    },
-    togglePopover() {
-      this.isOpen ? this.hidePopover() : this.showPopover();
-    },
-    updateSwatch(swatch, { fromFallbackInput } = {}) {
-      if (this.getSwatchDisabled(swatch)) return;
-      const color = this.getSwatchColor(swatch);
-      this.internalValue = color;
-      this.$emit("update:modelValue", color);
-      if (this.closeOnSelect && !this.inline && !fromFallbackInput) {
-        this.hidePopover();
+        // Showing bellow
+        styles.top = `${triggerRect.height +
+          DEFAULT_TRIGGER_CONTAINER_SPACE}px`;
+        styles.bottom = "auto";
       }
     }
   }
-});
+  if (props.popoverX === "left") {
+    if (triggerRect.right - containerRect.width < leftMin) {
+      // Showing at the right
+      styles.left = 0;
+      styles.right = "auto";
+    } else {
+      // Showing at the left
+      styles.right = 0;
+      styles.left = "auto";
+    }
+  } else {
+    /* istanbul ignore else */
+    if (props.popoverX === "right") {
+      if (triggerRect.left + containerRect.width > rightMax) {
+        // Showing at the left
+        styles.right = 0;
+        styles.left = "auto";
+      } else {
+        // Showing at the right
+        styles.left = 0;
+        styles.right = "auto";
+      }
+    }
+  }
+  return styles;
+};
+function getSwatchShowBorder(swatch: string | Record<string, any>) {
+  if (typeof swatch === "string") return computedShowBorder.value;
+  else if (typeof swatch === "object")
+    return swatch.showBorder !== undefined
+      ? swatch.showBorder
+      : computedShowBorder.value;
+};
+function getSwatchColor(swatch: string | Record<string, any>) {
+  if (typeof swatch === "string") return swatch;
+  else if (typeof swatch === "object") return swatch.color;
+};
+function getSwatchDisabled(swatch: string | Record<string, any>) {
+  if (typeof swatch === "string") return props.disabled;
+  else if (typeof swatch === "object")
+    return swatch.disabled !== undefined ? swatch.disabled : props.disabled;
+};
+function getSwatchLabel(swatch: string | Record<string, any>) {
+  if (typeof swatch === "string") return swatch;
+  else if (typeof swatch === "object") return swatch.label || swatch.color;
+};
+function getSwatchAlt(swatch: string | Record<string, any>) {
+  if (typeof swatch === "string") return swatch;
+  else if (typeof swatch === "object")
+    return swatch.alt || getSwatchLabel(swatch);
+};
+function onBlur(relatedTarget: HTMLElement) {
+  /* istanbul ignore if */
+  if (!isOpen.value) return; /* dont hide */
+  // We only close the Popover if the relatedTarget came from outside the component
+  // Check if the relatedTarget is inside the component
+  if (relatedTarget !== null && main.value?.contains(relatedTarget))
+    return; /* dont hide */
+  internalIsOpen.value = false;
+  $emit("close", internalValue.value);
+};
+function onFallbackButtonClick() {
+  hidePopover();
+};
+function showPopover() {
+  /* istanbul ignore if */
+  if (isOpen.value || props.inline || props.disabled) return; /* dont show */
+  alwaysOnScreenStyle.value = getAlwaysOnScreenStyle();
+  internalIsOpen.value = true;
+  main.value?.focus();
+  $emit("open");
+};
+function togglePopover() {
+  isOpen.value ? hidePopover() : showPopover();
+};
+// @ts-ignore
+function updateSwatch(swatch, { fromFallbackInput } = {}) {
+  if (getSwatchDisabled(swatch)) return;
+  const color = getSwatchColor(swatch);
+  internalValue.value = color;
+  $emit("update:modelValue", color);
+  if (props.closeOnSelect && !props.inline && !fromFallbackInput) {
+    hidePopover();
+  }
+};
 </script>
 
 <style>

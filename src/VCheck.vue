@@ -20,14 +20,6 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-
-export default defineComponent({
-  name: "v-check"
-});
-</script>
-
 <style>
 .vue-swatches__check__wrapper {
 	 position: absolute;
