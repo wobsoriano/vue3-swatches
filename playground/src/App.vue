@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import { basic } from 'vue3-swatches';
 import 'vue3-swatches/dist/style.css'
-console.log(basic)
+
 const color = ref(basic.colors[0])
 
 watch(color, (val) => {
