@@ -25,6 +25,7 @@
   ],
   "scripts": {
     "build": "rimraf dist && vue-tsc && vite build",
+    "prepublishOnly": "pnpm build",
     "release": "bumpp --commit --push --tag && pnpm publish"
   },
   "devDependencies": {
