@@ -7,7 +7,7 @@ Though not a fork, this package is a complete copy of [vue-swatches](https://git
 ## Install
 
 ```sh
-yarn add vue3-swatches
+pnpm add vue3-swatches
 ```
 
 ## Example
@@ -16,21 +16,23 @@ yarn add vue3-swatches
 
 ```js
 // main.js
-import { createApp } from "vue";
-import VSwatches from "vue3-swatches";
+import { createApp } from 'vue'
+import VSwatches from 'vue3-swatches'
+import 'vue3-swatches/dist/style.css'
 
-const app = createApp(App);
-app.use(VSwatches);
+const app = createApp(App)
+app.use(VSwatches)
 ```
 
 ### Or: Import it locally
 
 ```vue
 <script setup>
-  import { ref } from "vue";
-  import VSwatches from "vue3-swatches";
+  import { ref } from 'vue'
+  import { VSwatches } from 'vue3-swatches'
+  import 'vue3-swatches/dist/style.css'
 
-  const color = ref("#1FBC9C");
+  const color = ref("#1FBC9C")
 </script>
 
 <template>
