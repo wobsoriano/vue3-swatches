@@ -11,9 +11,19 @@
   "module": "dist/vue3-swatches.esm.js",
   "unpkg": "dist/vue3-swatches.min.js",
   "types": "./swatch.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/vue3-swatches.ssr.js",
+      "import": "./dist/vue3-swatches.esm.js"
+    },
+    "./nuxt": {
+      "import": "./nuxt/module.mjs"
+    }
+  },
   "files": [
     "dist/*",
-    "./swatch.d.ts"
+    "./swatch.d.ts",
+    "nuxt"
   ],
   "scripts": {
     "serve": "vue-cli-service serve dev/serve.js",
@@ -24,10 +34,10 @@
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
     "release": "bumpp --commit --push --tag && pnpm publish"
   },
-  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
+    "@nuxt/kit": "3.0.0-rc.13",
     "@rollup/plugin-alias": "^3.1.2",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^14.0.0",
