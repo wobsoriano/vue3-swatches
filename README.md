@@ -52,6 +52,14 @@ app.use(VSwatches)
 </template>
 ```
 
+### Nuxt
+
+```js
+export default defineNuxtConfig({
+  modules: ['vue3-swatches/nuxt']
+})
+```
+
 Head over to https://saintplay.github.io/vue-swatches/ for the complete documentation.
 
 ### License
