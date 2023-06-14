@@ -12,7 +12,7 @@ pnpm add vue3-swatches
 
 ## Example
 
-### Install as a global plugin (Optional)
+Install as a global plugin (Optional)
 
 ```js
 // main.js
@@ -24,7 +24,7 @@ const app = createApp(App)
 app.use(VSwatches)
 ```
 
-### Or: Import it locally
+or import it locally
 
 ```vue
 <script setup>
