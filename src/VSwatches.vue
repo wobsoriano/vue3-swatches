@@ -54,12 +54,12 @@
                 :row-length-setted="
                   rowLength !== null || presetRowLength !== null
                 "
-                :border-radius="computedBorderRadius as string"
+                :border-radius="computedBorderRadius.toString()"
                 :disabled="getSwatchDisabled(swatch)"
                 :inline="inline"
                 :selected="checkEquality(getSwatchColor(swatch), modelValue)"
-                :swatch-size="computedSwatchSize"
-                :spacing-size="computedSpacingSize as number"
+                :swatch-size="Number(computedSwatchSize)"
+                :spacing-size="Number(computedSpacingSize)"
                 :show-border="getSwatchShowBorder(swatch)"
                 :show-checkbox="showCheckbox"
                 :show-labels="showLabels"
@@ -67,7 +67,7 @@
                 :swatch-label="getSwatchLabel(swatch)"
                 :swatch-alt="getSwatchAlt(swatch)"
                 :swatch-style="swatchStyle"
-                @blur="relatedTarget => onBlur(relatedTarget)"
+                @blur="(relatedTarget: HTMLElement) => onBlur(relatedTarget)"
                 @click.native="updateSwatch(swatch)"
               />
             </div>
@@ -86,7 +86,7 @@
               :disabled="getSwatchDisabled(swatch)"
               :inline="inline"
               :selected="checkEquality(getSwatchColor(swatch), modelValue)"
-              :swatch-size="computedSwatchSize"
+              :swatch-size="Number(computedSwatchSize)"
               :spacing-size="computedSpacingSize as number"
               :show-border="getSwatchShowBorder(swatch)"
               :show-checkbox="showCheckbox"
@@ -95,7 +95,7 @@
               :swatch-label="getSwatchLabel(swatch)"
               :swatch-alt="getSwatchAlt(swatch)"
               :swatch-style="swatchStyle"
-              @blur="relatedTarget => onBlur(relatedTarget)"
+              @blur="(relatedTarget: HTMLElement) => onBlur(relatedTarget)"
               @click.native="updateSwatch(swatch)"
             />
           </template>
@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, onMounted, ref, StyleValue, watch } from "vue";
+import { computed, onMounted, ref, StyleValue, watch } from "vue";
 import basicPreset from "./presets/basic";
 import textBasicPreset from "./presets/text-basic";
 import textAdvancedPreset from "./presets/text-advanced";
@@ -263,11 +263,11 @@ const computedSwatches = computed(() => {
   if (props.swatches instanceof Array) return props.swatches;
   /* istanbul ignore else */
   if (typeof props.swatches === "string") {
-    return extractPropertyFromPreset(props.swatches, "colors", true);
+    return extractPropertyFromPreset(props.swatches, "colors", true) as [];
   } else {
     return [];
   }
-}) as ComputedRef<[]>;
+});
 const computedBorderRadius = computed(() => {
   // Priorize preset value
   if (presetBorderRadius.value !== null) return presetBorderRadius.value;
@@ -296,14 +296,14 @@ const computedSwatchSize = computed(() => {
     return presetSwatchSize.value;
   // Use default value if these two are unset
   return DEFAULT_SWATCH_SIZE;
-}) as ComputedRef<number>;
+});
 const computedSpacingSize = computed(() => {
   // Priorize user value
   if (props.spacingSize !== null) return props.spacingSize;
   // Priorize preset value
   if (presetSpacingSize.value !== null) return presetSpacingSize.value;
   // over computed value
-  return Math.round(computedSwatchSize.value * 0.25);
+  return Math.round(Number(computedSwatchSize.value) * 0.25);
 });
 const computedShowBorder = computed(() => {
   // Priorize user value
@@ -318,7 +318,7 @@ const showFallbackOk = computed(() => {
 });
 const borderRadius = computed(() => {
   if (props.shapes === "squares")
-    return `${Math.round(computedSwatchSize.value * 0.25)}px`;
+    return `${Math.round(Number(computedSwatchSize.value) * 0.25)}px`;
   else if (props.shapes === "circles") return `50%`;
   /* istanbul ignore next */
   return "";
