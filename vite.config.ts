@@ -8,7 +8,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'vue3-swatches',
-      formats: ['es', 'cjs'],
+      formats: ['es', 'cjs', 'umd'],
     },
     rollupOptions: {
       // external modules won't be bundled into your library

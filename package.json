@@ -8,7 +8,17 @@
   ],
   "main": "dist/vue3-swatches.js",
   "module": "dist/vue3-swatches.mjs",
+  "unpkg": "dist/vue3-swatches.umd.js",
+  "jsdelivr": "dist/vue3-swatches.umd.js",
   "types": "./dist/types/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./*"
+      ]
+    }
+  },
   "exports": {
     ".": {
       "require": "./dist/vue3-swatches.js",
