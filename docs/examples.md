@@ -1,5 +1,5 @@
 ---
-outline: deep
+sidebar: auto
 ---
 
 # Examples
@@ -8,6 +8,7 @@ outline: deep
 import Simple from './components/examples/Simple.vue'
 import Preset from './components/examples/Preset.vue'
 import CustomTrigger from './components/examples/CustomTrigger.vue'
+import CustomColors from './components/examples/CustomColors.vue'
 </script>
 
 <style>
@@ -45,10 +46,36 @@ import CustomTrigger from './components/examples/CustomTrigger.vue'
 
 <Simple />
 
+:::details View Code
+<<< ./components/examples/Simple.vue
+:::
+
 ## Using a Preset
+
+Vue Swatches has a bunch of [presets](/presets) ready to use. Make sure to check it out!
 
 <Preset />
 
+::: details View Code
+<<< ./components/examples/Preset.vue
+:::
+
 ## Using a Custom Trigger
 
+You can use your custom trigger. Useful to show `buttons`, `icons`, custom `inputs`!
+
 <CustomTrigger />
+
+:::details View Code
+<<< ./components/examples/CustomTrigger.vue
+:::
+
+## Custom Colors
+
+Remember to use always **6-digits** hexadecimal colors. If you want to provide a **transparent/no-color** option you can use a empty string (`''`).
+
+<CustomColors />
+
+::: details View Code
+<<< ./components/examples/CustomColors.vue
+:::

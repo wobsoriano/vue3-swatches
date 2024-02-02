@@ -12,6 +12,10 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Guide', link: '/guide' },
+      { text: 'Examples', link: '/examples' },
+      { text: 'API', link: '/api/props', activeMatch: '/api/' },
+      { text: 'Presets', link: '/presets' },
       {
         text: pkg.version,
         items: [
@@ -37,18 +41,19 @@ export default defineConfig({
       // copyright: 'Copyright © 2023-present Robert Soriano',
     },
 
-    sidebar: [
-      {
-        text: 'Introduction',
-        items: [
-          { text: 'Getting Started', link: '/getting-started' },
-        ],
-      },
-      {
-        text: 'Examples',
-        link: '/examples'
-      }
-    ],
+    sidebar: {
+      '/api/': [
+        {
+          text: 'API',
+          base: '/api',
+          items: [
+            { text: 'Props', link: '/props' },
+            { text: 'Events', link: '/events' },
+            { text: 'Slots', link: '/slots' },
+          ],
+        },
+      ]
+    },
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/wobsoriano/vue-clerk' },

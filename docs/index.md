@@ -9,7 +9,7 @@ hero:
   actions:
     - theme: brand
       text: Getting Started
-      link: /getting-started
+      link: /guide
     - theme: alt
       text: View on GitHub
       link: https://github.com/wobsoriano/vue-clerk
