@@ -6,13 +6,14 @@
     "vue",
     "swatch"
   ],
-  "main": "dist/vue3-swatches.cjs.js",
-  "module": "dist/vue3-swatches.es.js",
+  "main": "dist/vue3-swatches.js",
+  "module": "dist/vue3-swatches.mjs",
   "types": "./dist/types/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/vue3-swatches.cjs.js",
-      "import": "./dist/vue3-swatches.es.js"
+      "require": "./dist/vue3-swatches.js",
+      "import": "./dist/vue3-swatches.mjs",
+      "types": "./dist/types/index.d.ts"
     },
     "./nuxt": {
       "import": "./nuxt/module.mjs"

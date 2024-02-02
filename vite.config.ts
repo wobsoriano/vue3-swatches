@@ -8,8 +8,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, 'src/index.ts'),
       name: 'vue3-swatches',
-      formats: ['es', 'cjs'], // adding 'umd' requires globals set to every external module
-      fileName: (format) => `vue3-swatches.${format}.js`,
+      formats: ['es', 'cjs'],
     },
     rollupOptions: {
       // external modules won't be bundled into your library
