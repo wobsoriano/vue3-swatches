@@ -9,6 +9,12 @@ import Simple from './components/examples/Simple.vue'
 import Preset from './components/examples/Preset.vue'
 import CustomTrigger from './components/examples/CustomTrigger.vue'
 import CustomColors from './components/examples/CustomColors.vue'
+import NestedColors from './components/examples/NestedColors.vue'
+import InlineSimple from './components/examples/InlineSimple.vue'
+import InlineAdvanced from './components/examples/InlineAdvanced.vue'
+import Disabling from './components/examples/Disabling.vue'
+import FallbackInput from './components/examples/FallbackInput.vue'
+import FallbackInputColor from './components/examples/FallbackInputColor.vue'
 </script>
 
 <style>
@@ -78,4 +84,62 @@ Remember to use always **6-digits** hexadecimal colors. If you want to provide a
 
 ::: details View Code
 <<< ./components/examples/CustomColors.vue
+:::
+
+## Nested Colors
+
+You can use your own colors in a nested arrays.
+
+<NestedColors />
+
+::: details View Code
+<<< ./components/examples/NestedColors.vue
+:::
+
+## Inline Mode
+
+Inline Mode hides the trigger and show all the swatches right away! Useful for Advanced UI
+
+<InlineSimple />
+
+::: details View Code
+<<< ./components/examples/InlineSimple.vue
+:::
+
+## Inline + Custom UI
+
+<InlineAdvanced />
+
+::: details View Code
+<<< ./components/examples/InlineAdvanced.vue
+:::
+
+## Disabling Swatches
+
+You can disable specific swatches adding `disabled: true`
+
+<Disabling />
+
+::: details View Code
+<<< ./components/examples/Disabling.vue
+:::
+
+## Fallback Input
+
+If your user wants to use its own color you can use a fallback input and customizing it with `fallback-input-class`, `fallback-ok-class` and '`fallback-ok-text`'
+
+<FallbackInput />
+
+::: details View Code
+<<< ./components/examples/FallbackInput.vue
+:::
+
+## Fallback Input + Color Picker
+
+You can set the fallback input type to color and get a visual color picker interface
+
+<FallbackInputColor />
+
+::: details View Code
+<<< ./components/examples/FallbackInputColor.vue
 :::
